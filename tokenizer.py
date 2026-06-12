@@ -1,3 +1,6 @@
+from pathlib import Path
+
+
 class CharTokenizer:
     def __init__(self, text: str) -> None:
         self.text = text
@@ -13,14 +16,15 @@ class CharTokenizer:
         return "".join(self.itos[i] for i in indices)
 
     @classmethod
-    def from_file(cls, path: str, normalise: bool = True) -> "CharTokenizer":
+    def from_file(cls, path: Path, normalise: bool = True) -> "CharTokenizer":
         with open(path, encoding="utf-8") as f:
             text = f.read()
         if normalise:
             text = (
-                text
-                .replace("‘", "'").replace("’", "'")
-                .replace("“", '"').replace("”", '"')
+                text.replace("‘", "'")  # noqa: RUF001
+                .replace("’", "'")  # noqa: RUF001
+                .replace("“", '"')
+                .replace("”", '"')
                 .replace("—", "-")
                 .replace("\t", " ")
             )

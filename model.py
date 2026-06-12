@@ -1,4 +1,3 @@
-import math
 from dataclasses import dataclass
 
 import torch
@@ -92,7 +91,7 @@ class GPT(nn.Module):
             nn.init.normal_(module.weight, std=0.02)
 
     def forward(self, idx: Tensor, targets: Tensor | None = None) -> tuple[Tensor, Tensor | None]:
-        B, T = idx.shape
+        _B, T = idx.shape
         tok = self.token_emb(idx)
         pos = self.pos_emb(torch.arange(T, device=idx.device))
         x = self.drop(tok + pos)

@@ -1,22 +1,30 @@
+from dataclasses import dataclass
+from pathlib import Path
+
 import torch
 
+from report import write_report
 from tokenizer import CharTokenizer
 from train import train
 
-CONFIG = {
+
+@dataclass
+class Config:
     # Data
-    "data_path": "data",
+    data_path: Path = Path("data.txt")
     # Model (MPS-friendly defaults; see README for CPU/GPU presets)
-    "context_length": 256,
-    "n_embd": 256,
-    "n_heads": 8,
-    "n_layers": 6,
-    "dropout": 0.1,
+    context_length: int = 256
+    n_embd: int = 256
+    n_heads: int = 8
+    n_layers: int = 6
+    dropout: float = 0.1
     # Training
-    "batch_size": 64,
-    "epochs": 10,
-    "lr": 3e-4,
-}
+    batch_size: int = 64
+    epochs: int = 10
+    lr: float = 3e-4
+
+
+CONFIG = Config()
 
 
 def get_device() -> torch.device:
@@ -31,14 +39,10 @@ def main() -> None:
     device = get_device()
     print(f"Using device: {device}")
 
-    model = train(CONFIG, device)
+    model, history = train(CONFIG, device)
 
-    tokenizer = CharTokenizer.from_file(CONFIG["data_path"])
-    prompt = "To be or not to be"
-    context = torch.tensor(tokenizer.encode(prompt), dtype=torch.long).unsqueeze(0).to(device)
-    out = model.generate(context, max_new_tokens=200, temperature=0.8, top_k=40)
-    print("\n--- Generated text ---")
-    print(tokenizer.decode(out[0].tolist()))
+    tokenizer = CharTokenizer.from_file(CONFIG.data_path)
+    write_report(history, CONFIG, model, tokenizer, device)
 
 
 if __name__ == "__main__":
