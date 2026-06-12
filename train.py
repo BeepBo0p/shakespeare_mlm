@@ -5,8 +5,8 @@ import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
+from config import Config
 from dataset import ShakespeareDataset
-from main import Config
 from model import GPT, GPTConfig
 from tokenizer import CharTokenizer
 
@@ -37,6 +37,7 @@ def train(config: Config, device: torch.device) -> tuple[GPT, list[dict]]:
     train_ds = ShakespeareDataset(tokens[:n], config.context_length)
     val_ds = ShakespeareDataset(tokens[n:], config.context_length)
 
+    print(len(train_ds))
     pin = device.type == "cuda"
     train_loader = DataLoader(
         train_ds, batch_size=config.batch_size, shuffle=True, pin_memory=pin, num_workers=0
@@ -59,7 +60,11 @@ def train(config: Config, device: torch.device) -> tuple[GPT, list[dict]]:
 
     history: list[dict] = []
 
-    with open("training_log.csv", "w", newline="") as csv_file:
+    config.output_dir.mkdir(parents=True, exist_ok=True)
+    ckpt_dir = config.output_dir / "checkpoints"
+    ckpt_dir.mkdir(exist_ok=True)
+
+    with open(config.output_dir / "training_log.csv", "w", newline="") as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=_CSV_FIELDS)
         writer.writeheader()
 
@@ -105,7 +110,7 @@ def train(config: Config, device: torch.device) -> tuple[GPT, list[dict]]:
                     "epoch": epoch,
                     "val_loss": val_loss,
                 },
-                f"ckpt_{epoch}.pt",
+                ckpt_dir / f"ckpt_{epoch}.pt",
             )
 
     return model, history

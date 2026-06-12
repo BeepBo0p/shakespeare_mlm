@@ -1,8 +1,10 @@
 from datetime import datetime
+from pathlib import Path
 
+import asciichartpy
 import torch
 
-from main import Config
+from config import Config
 from model import GPT
 from tokenizer import CharTokenizer
 
@@ -13,7 +15,7 @@ def write_report(
     model: GPT,
     tokenizer: CharTokenizer,
     device: torch.device,
-    output_path: str = "training_report.md",
+    output_path: Path = Path("training_report.md"),
 ) -> None:
     cfg = model.config
     n_tokens = len(tokenizer.text)
@@ -80,8 +82,20 @@ def write_report(
     h("")
 
     h(
-        f"**Best checkpoint:** epoch {best['epoch']} — val_loss={best['val_loss']:.4f} → `ckpt_{best['epoch']}.pt`\n"
+        f"**Best checkpoint:** epoch {best['epoch']} — val_loss={best['val_loss']:.4f} → `checkpoints/ckpt_{best['epoch']}.pt`\n"
     )
+
+    h("## Loss Curves\n")
+    train_losses = [r["train_loss"] for r in history]
+    val_losses = [r["val_loss"] for r in history]
+    chart = asciichartpy.plot(
+        [train_losses, val_losses],
+        {"height": 10},
+    )
+    h("```")
+    h("train ───  val ───")
+    h(chart)
+    h("```\n")
 
     h("## Generated sample\n")
     h(f'Prompt: `"{prompt}"`\n')
