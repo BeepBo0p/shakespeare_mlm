@@ -1,13 +1,11 @@
 import torch
 
-from config import Config, TestConfig
-from report import write_report
-from tokenizer import CharTokenizer
-from train import train
+from .config import TestConfig, make_config
+from .report import write_report
+from .tokenizer import CharTokenizer
+from .train import train
 
 TEST = True
-
-CONFIG = Config() if not TEST else TestConfig()
 
 
 def get_device() -> torch.device:
@@ -22,11 +20,12 @@ def main() -> None:
     device = get_device()
     print(f"Using device: {device}")
 
-    model, history = train(CONFIG, device)
+    config = TestConfig() if TEST else make_config(device)
+    model, history = train(config, device)
 
-    tokenizer = CharTokenizer.from_file(CONFIG.data_path)
+    tokenizer = CharTokenizer.from_file(config.data_path)
     write_report(
-        history, CONFIG, model, tokenizer, device, CONFIG.output_dir / "training_report.md"
+        history, config, model, tokenizer, device, config.output_dir / "training_report.md"
     )
 
 

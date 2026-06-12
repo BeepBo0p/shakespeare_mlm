@@ -5,10 +5,10 @@ import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from config import Config
-from dataset import ShakespeareDataset
-from model import GPT, GPTConfig
-from tokenizer import CharTokenizer
+from .config import Config
+from .dataset import ShakespeareDataset
+from .model import GPT, GPTConfig
+from .tokenizer import CharTokenizer
 
 _GPT_CONFIG_FIELDS = {"context_length", "n_embd", "n_heads", "n_layers", "dropout"}
 _CSV_FIELDS = ["epoch", "train_loss", "val_loss", "lr", "epoch_secs"]

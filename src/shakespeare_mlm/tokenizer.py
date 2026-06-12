@@ -21,8 +21,8 @@ class CharTokenizer:
             text = f.read()
         if normalise:
             text = (
-                text.replace("‘", "'")  # noqa: RUF001
-                .replace("’", "'")  # noqa: RUF001
+                text.replace("'", "'")
+                .replace("'", "'")
                 .replace("“", '"')
                 .replace("”", '"')
                 .replace("—", "-")

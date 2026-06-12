@@ -4,9 +4,9 @@ from pathlib import Path
 import asciichartpy
 import torch
 
-from config import Config
-from model import GPT
-from tokenizer import CharTokenizer
+from .config import Config
+from .model import GPT
+from .tokenizer import CharTokenizer
 
 
 def write_report(

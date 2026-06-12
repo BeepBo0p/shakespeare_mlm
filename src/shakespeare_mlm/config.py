@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from pathlib import Path
 
+import torch
+
 DATA_ROOT_PATH = Path("data")
 
 
@@ -36,3 +38,13 @@ class TestConfig(Config):
     batch_size: int = 64
     epochs: int = 100
     lr: float = 3e-4
+
+
+def make_config(device: torch.device) -> Config:
+    match device.type:
+        case "cuda":
+            return Config(n_embd=512, n_heads=8, n_layers=8, context_length=512)
+        case "mps":
+            return Config(n_embd=256, n_heads=8, n_layers=6, context_length=256)
+        case _:
+            return Config(n_embd=64, n_heads=2, n_layers=2, context_length=128)
